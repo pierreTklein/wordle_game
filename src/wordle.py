@@ -33,7 +33,7 @@ class Wordle:
         return guess_word in self.words
 
     def guess(self, guess_word: str) -> GuessResult:
-        if self.num_tries_remaining < 0:
+        if self.num_tries_remaining <= 0:
             raise Exception('No more guesses available.')
 
         if not self.is_valid_guess(guess_word):
