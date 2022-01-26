@@ -1,0 +1,35 @@
+from wordle import Wordle, GuessResult
+
+
+class WordleSolverBase:
+    def __init__(self, game: Wordle) -> None:
+        self.game = game
+
+    def get_guess(self) -> str:
+        """Returns the next guess to try."""
+        raise NotImplementedError('Not yet implemented.')
+
+    def make_guess(self, guess: str) -> GuessResult:
+        """Makes the guess."""
+        result = self.game.guess(guess)
+        # Consider overriding this function to store state.
+        return result
+
+    def can_guess(self) -> bool:
+        """Returns whether we can make another guess in the game."""
+        return self.game.can_guess()
+
+    def has_won(self) -> bool:
+        """Returns whether solver has completed the game."""
+        return self.game.has_won()
+
+    def play_game(self) -> int:
+        """Plays out the entire game. 
+
+        Returns the number of turns it took to guess the correct word. If it didn't guess
+        the correct word, then it returns 0."""
+        while self.can_guess() and not self.has_won():
+            self.make_guess(self.get_guess())
+        if self.has_won():
+            return len(self.game.guesses)
+        return 0
