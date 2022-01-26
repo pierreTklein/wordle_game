@@ -61,6 +61,9 @@ class Wordle:
         else:
             return False
 
+    def get_score(self) -> int:
+        return len(self.guesses) if self.has_won() else -1
+
     def rig_game(self, secret_word: str):
         self._secret_word = secret_word
 

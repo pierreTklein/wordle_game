@@ -12,9 +12,9 @@ python3 src/wordle_main.py --play_type=human
 
 So you want to write an algorithm that can solve Wordle in as few turns as possible?
 
-1. Create a new class that inherits from `WordleSolverBase`.
+1. Create a new class that inherits from `BaseStrategy`.
 2. Change the implementation of the `get_guess()` function, as well as the `make_guess()` function.
-3. Update `wordle_main` to import the new `WordleSolver` class that you created.
+3. Update `wordle_main` to import the new `SimilarWordStrategy` class that you created.
 4. Run it: `python3 src/wordle_main.py --play_type=ai`
 
-I have taken the liberty of implementing & wiring together `WordleSolverRandom` to show how you can wire your own algorithm in.
+I have taken the liberty of implementing & wiring together `RandomStrategy` to show how you can wire your own algorithm in.

@@ -1,6 +1,6 @@
 # src directory
 
-1. `wordle_main.py`: The runner
-2. `wordle_solver_base.py`: The module that contains the base python class that your AI should inherit from.
-3. `wordle_solver_random.py`: The module that applies the 'random' strategy to solve wordle. It's very bad. I think it has never beaten the game.
-4. `wordle.py`: The module that contains game logic.
+1. `strategies`: Contains different ways to solve wordle.
+2. `util`: modules that are used by the algorithms in `strategies`.
+3. `wordle_main.py`: The runner
+4. `wordle.py`: The game engine

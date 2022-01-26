@@ -1,11 +1,13 @@
 from absl import app
 from absl import flags
 
-from typing import List, Tuple
 
-from numpy import array, average, histogram
+from numpy import average, histogram
 from wordle import Result, Wordle
-from wordle_solver_random import WordleSolverRandom
+##############################################
+# CHANGE THIS TO WHICHEVER CLASS YOU CREATED #
+##############################################
+from strategies.similar_words import SimilarWordStrategy
 
 flags.DEFINE_string('words_file', './bag_of_words.txt',
                     'The path to the bag of words.')
@@ -28,7 +30,7 @@ def ai_evaluator(game: Wordle, num_runs: int) -> None:
         ##############################################
         # CHANGE THIS TO WHICHEVER CLASS YOU CREATED #
         ##############################################
-        solver = WordleSolverRandom(game)
+        solver = SimilarWordStrategy(game)
         result = solver.play_game()
         print('Run result:', result, '| Guessed:', game.get_guessed_words(), '| Secret:', game._secret_word)
         if result > 0:
@@ -37,7 +39,7 @@ def ai_evaluator(game: Wordle, num_runs: int) -> None:
             num_failures += 1
     print('Total rounds:', num_runs)
     print('Num failed rounds:', num_failures)
-    print('Average score:', average(run_score) if run_score else -1)
+    print('Average win score:', average(run_score) if run_score else -1)
     print('histogram: ', histogram(run_score, bins=5, range=(1, game.num_tries_initial + 1))[0])
 
 def human_game(game: Wordle):
@@ -45,7 +47,7 @@ def human_game(game: Wordle):
     while game.can_guess() and not game.has_won():
         guess = ''
         print('Available letters:', ','.join(sorted(list(letters))))
-        guess = input('Enter guess:')
+        guess = input(f'[{len(game.guesses)+1}/{game.num_tries_initial}] Enter guess:')
         if not game.is_valid_guess(guess):
             print('Invalid word, please try again.')
             continue
@@ -56,6 +58,9 @@ def human_game(game: Wordle):
                 letters.remove(guess[i])
             pretty_result += f'{guess[i]}: {r.name} | '
         print(pretty_result)
+    print(game.get_score())
+    if not game.has_won():
+        print('You ran out of moves. The secret was:', game._secret_word)
 
 def main(argv):
     if len(argv) > 1:

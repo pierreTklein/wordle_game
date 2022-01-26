@@ -1,8 +1,8 @@
 import random
 from wordle import Wordle
-from wordle_solver_base import WordleSolverBase
+from strategies.base import BaseStrategy
 
-class WordleSolverRandom(WordleSolverBase):
+class RandomStrategy(BaseStrategy):
     def __init__(self, game: Wordle) -> None:
         super().__init__(game)
     

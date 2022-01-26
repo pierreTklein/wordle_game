@@ -1,7 +1,7 @@
 from wordle import Wordle, GuessResult
 
 
-class WordleSolverBase:
+class BaseStrategy:
     def __init__(self, game: Wordle) -> None:
         self.game = game
 
@@ -26,10 +26,7 @@ class WordleSolverBase:
     def play_game(self) -> int:
         """Plays out the entire game. 
 
-        Returns the number of turns it took to guess the correct word. If it didn't guess
-        the correct word, then it returns 0."""
+        Returns the game score."""
         while self.can_guess() and not self.has_won():
             self.make_guess(self.get_guess())
-        if self.has_won():
-            return len(self.game.guesses)
-        return 0
+        return self.game.get_score()
