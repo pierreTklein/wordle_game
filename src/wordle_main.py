@@ -5,7 +5,7 @@ from typing import List
 
 from numpy import histogram
 from wordle import Wordle
-from wordle_solver import WordleSolver
+from wordle_solver_base import WordleSolverBase
 
 flags.DEFINE_string('words_file', './bag_of_words.txt',
                     'The path to the bag of words.')
@@ -19,7 +19,7 @@ def ai_evaluator(game: Wordle, num_runs: int) -> List[int]:
     run_score = []
     for i in range(0, num_runs):
         game.reset()
-        solver = WordleSolver(game)
+        solver = WordleSolverBase(game)
         result = solver.play_game()
         print('Run result:', result, game.get_guess_words(), game._secret_word)
         run_score.append(result)
