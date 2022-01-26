@@ -4,10 +4,13 @@ from absl import flags
 
 from numpy import average, histogram
 from wordle import Result, Wordle
-##############################################
-# CHANGE THIS TO WHICHEVER CLASS YOU CREATED #
-##############################################
 from strategies.similar_words import SimilarWordsStrategy
+from strategies.base import BaseStrategy
+from strategies.random import RandomStrategy
+##############################################
+# (1) Import your strategy here              #
+##############################################
+
 
 flags.DEFINE_string('words_file', './bag_of_words.txt',
                     'The path to the bag of words.')
@@ -17,21 +20,35 @@ flags.DEFINE_integer(
 
 flags.DEFINE_enum('play_type', 'ai', ['ai', 'human'], 'Whether you want to play yourself, or you want the AI to play.')
 
+##############################################
+# (2) Add a flag value for your strat        #
+##############################################
+flags.DEFINE_enum('strategy', 'similar_words', ['random', 'similar_words'], 'What type of strategy you want the AI to use.')
+
 flags.DEFINE_string('secret_word_override', None, 'Set this flag to the word that you want to be the secret one.')
 
 FLAGS = flags.FLAGS
 
+def pick_ai(game: Wordle, strategy: str) -> BaseStrategy:
+    """Add your strategy in here."""
+    if strategy == 'random':
+        return RandomStrategy(game)
+    elif strategy == 'similar_words':
+        return SimilarWordsStrategy(game)
+    ##############################################
+    # (3) Construct your strategy here           #
+    ##############################################
+    else:
+        return BaseStrategy(game)
 
-def ai_evaluator(game: Wordle, num_runs: int) -> None:
+
+def ai_evaluator(game: Wordle, num_runs: int, strategy: str) -> None:
     run_score = []
     num_failures = 0
     for i in range(0, num_runs):
         game.reset()
-        ##############################################
-        # CHANGE THIS TO WHICHEVER CLASS YOU CREATED #
-        ##############################################
-        solver = SimilarWordsStrategy(game)
-        result = solver.play_game()
+        ai = pick_ai(game, strategy)
+        result = ai.play_game()
         print('Run result:', result, '| Guessed:', game.get_guessed_words(), '| Secret:', game._secret_word)
         if result > 0:
             run_score.append(result)
@@ -69,7 +86,7 @@ def main(argv):
     if FLAGS.secret_word_override:
         game.rig_game(FLAGS.secret_word_override)
     if FLAGS.play_type == 'ai':
-        ai_evaluator(game, FLAGS.num_evals)
+        ai_evaluator(game, FLAGS.num_evals, FLAGS.strategy)
     else:
         human_game(game)
 
