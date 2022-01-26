@@ -7,7 +7,7 @@ from wordle import Result, Wordle
 ##############################################
 # CHANGE THIS TO WHICHEVER CLASS YOU CREATED #
 ##############################################
-from strategies.similar_words import SimilarWordStrategy
+from strategies.similar_words import SimilarWordsStrategy
 
 flags.DEFINE_string('words_file', './bag_of_words.txt',
                     'The path to the bag of words.')
@@ -30,7 +30,7 @@ def ai_evaluator(game: Wordle, num_runs: int) -> None:
         ##############################################
         # CHANGE THIS TO WHICHEVER CLASS YOU CREATED #
         ##############################################
-        solver = SimilarWordStrategy(game)
+        solver = SimilarWordsStrategy(game)
         result = solver.play_game()
         print('Run result:', result, '| Guessed:', game.get_guessed_words(), '| Secret:', game._secret_word)
         if result > 0:

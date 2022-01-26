@@ -5,7 +5,7 @@ from strategies.random import BaseStrategy
 from util.probabilities import Probabilities
 
 
-class SimilarWordStrategy(BaseStrategy):
+class SimilarWordsStrategy(BaseStrategy):
     def __init__(self, game: Wordle) -> None:
         super().__init__(game)
         self.remaining_words = game.words
