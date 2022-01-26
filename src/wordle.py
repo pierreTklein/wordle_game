@@ -29,11 +29,14 @@ class Wordle:
     def can_guess(self) -> bool:
         return self.num_tries_remaining > 0
 
+    def is_valid_guess(self, guess_word: str) -> bool:
+        return guess_word in self.words
+
     def guess(self, guess_word: str) -> GuessResult:
         if self.num_tries_remaining < 0:
             raise Exception('No more guesses available.')
 
-        if guess_word not in self.words:
+        if not self.is_valid_guess(guess_word):
             raise Exception(f'{guess_word} is not a valid word.')
 
         self.num_tries_remaining -= 1
@@ -49,7 +52,7 @@ class Wordle:
         self.guesses.append(guess_result)
         return guess_result
 
-    def get_guess_words(self) -> List[str]:
+    def get_guessed_words(self) -> List[str]:
         return list(map(lambda t: t[0], self.guesses))
 
     def has_won(self) -> bool:
