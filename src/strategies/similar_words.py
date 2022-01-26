@@ -1,3 +1,4 @@
+from functools import reduce
 import re
 
 from wordle import Wordle, Result, GuessResult
@@ -38,7 +39,12 @@ class SimilarWordsStrategy(BaseStrategy):
                 # The letter in this position should not be a bad letter or a not_here letter.
                 candidate_mask[i] = ''.join(
                     ('[^', ''.join(self.bad_letters), ''.join(self.not_here_letters[i]), ']'))
-        return ''.join(candidate_mask)
+        # Get the set of letters that we know exist in the word somewhere
+        not_here_set = reduce(lambda s1, s2: s1.union(s2), self.not_here_letters, set())
+        # These letters must be in the remaining bag-of-words
+        not_here_pos_lookahead = ''.join(map(lambda c: f'(?=.*{c})', not_here_set))
+        mask = not_here_pos_lookahead + ''.join(candidate_mask)
+        return mask
 
     def _update_remaining_words(self) -> None:
         """Eliminate words that are no longer candidates."""
