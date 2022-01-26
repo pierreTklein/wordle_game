@@ -4,7 +4,7 @@ from absl import flags
 from typing import List, Tuple
 
 from numpy import array, average, histogram
-from wordle import Wordle
+from wordle import Result, Wordle
 from wordle_solver_random import WordleSolverRandom
 
 flags.DEFINE_string('words_file', './bag_of_words.txt',
@@ -41,8 +41,10 @@ def ai_evaluator(game: Wordle, num_runs: int) -> None:
     print('histogram: ', histogram(run_score, bins=5, range=(1, game.num_tries_initial + 1))[0])
 
 def human_game(game: Wordle):
+    letters = set(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'])
     while game.can_guess() and not game.has_won():
         guess = ''
+        print('Available letters:', ','.join(sorted(list(letters))))
         guess = input('Enter guess:')
         if not game.is_valid_guess(guess):
             print('Invalid word, please try again.')
@@ -50,6 +52,8 @@ def human_game(game: Wordle):
         guess, result = game.guess(guess)
         pretty_result = ''
         for i,r in enumerate(result):
+            if r == Result.INVALID and guess[i] in letters:
+                letters.remove(guess[i])
             pretty_result += f'{guess[i]}: {r.name} | '
         print(pretty_result)
 
