@@ -3,7 +3,7 @@ from absl import flags
 
 from typing import List, Tuple
 
-from numpy import array, histogram
+from numpy import array, average, histogram
 from wordle import Wordle
 from wordle_solver_random import WordleSolverRandom
 
@@ -20,15 +20,25 @@ flags.DEFINE_string('secret_word_override', None, 'Set this flag to the word tha
 FLAGS = flags.FLAGS
 
 
-def ai_evaluator(game: Wordle, num_runs: int) -> Tuple[array, array]:
+def ai_evaluator(game: Wordle, num_runs: int) -> None:
     run_score = []
+    num_failures = 0
     for i in range(0, num_runs):
         game.reset()
+        ##############################################
+        # CHANGE THIS TO WHICHEVER CLASS YOU CREATED #
+        ##############################################
         solver = WordleSolverRandom(game)
         result = solver.play_game()
         print('Run result:', result, '| Guessed:', game.get_guessed_words(), '| Secret:', game._secret_word)
-        run_score.append(result)
-    return histogram(run_score, bins=6, range=(0, game.num_tries_initial + 1))
+        if result > 0:
+            run_score.append(result)
+        else:
+            num_failures += 1
+    print('Total rounds:', num_runs)
+    print('Num failed rounds:', num_failures)
+    print('Average score:', average(run_score) if run_score else -1)
+    print('histogram: ', histogram(run_score, bins=5, range=(1, game.num_tries_initial + 1))[0])
 
 def human_game(game: Wordle):
     while game.can_guess() and not game.has_won():
@@ -50,7 +60,7 @@ def main(argv):
     if FLAGS.secret_word_override:
         game.rig_game(FLAGS.secret_word_override)
     if FLAGS.play_type == 'ai':
-        print(ai_evaluator(game, FLAGS.num_evals))
+        ai_evaluator(game, FLAGS.num_evals)
     else:
         human_game(game)
 
