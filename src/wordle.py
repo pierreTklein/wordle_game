@@ -22,7 +22,7 @@ class GameResult(NamedTuple):
 
 
 class Wordle:
-    def __init__(self, words: List[str], word_len: int = 5, num_tries_initial: int = 5, prev_guesses: Optional[List[GuessResult]] = None) -> None:
+    def __init__(self, words: List[str], word_len: int = 5, num_tries_initial: int = 6, prev_guesses: Optional[List[GuessResult]] = None) -> None:
         self.word_len = word_len
         self.words = words
         self._secret_word = random.choice(seq=words)
