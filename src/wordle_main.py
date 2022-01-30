@@ -5,13 +5,14 @@ from absl import flags
 
 from numpy import average, histogram
 from wordle import GameResult, Wordle
-from strategies.similar_words import SimilarWordsStrategy
-from strategies.base import BaseStrategy
-from strategies.random import RandomStrategy
-from strategies.human import HumanStrategy
+
 ##############################################
 # (1) Import your strategy here              #
 ##############################################
+from strategies.base import BaseStrategy
+from strategies.human import HumanStrategy
+from strategies.random import RandomStrategy
+from strategies.similar_words import SimilarWordsStrategy
 
 
 flags.DEFINE_string('words_file', './bag_of_words.txt',
