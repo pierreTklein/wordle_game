@@ -5,13 +5,13 @@ This is a python implementation of wordle, which uses the same set of available 
 ## Play the game manually
 
 ```bash
-python3 src/wordle_main.py --play_type=human
+python3 src/wordle_main.py --strategy=human
 ```
 
 ## Play the game using an AI
 
 ```bash
-python3 src/wordle_main.py --play_type=ai --strategy=(random|similar_words)
+python3 src/wordle_main.py --strategy=(random|similar_words)
 ```
 
 ## Implement an algorithm to solve it
