@@ -9,14 +9,17 @@ class Result(Enum):
     IN_WORD = 2
     INVALID = 3
 
+
 class GuessResult(NamedTuple):
     guess: str
     result: Tuple[Result]
+
 
 class GameResult(NamedTuple):
     secret_word: str
     score: int
     guessed_words: Sequence[str]
+
 
 class Wordle:
     def __init__(self, words: List[str], word_len: int = 5, num_tries_initial: int = 5, prev_guesses: Optional[List[GuessResult]] = None) -> None:

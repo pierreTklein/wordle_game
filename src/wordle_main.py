@@ -4,12 +4,11 @@ from absl import flags
 
 
 from numpy import average, histogram
-from wordle import GameResult, Result, Wordle
+from wordle import GameResult, Wordle
 from strategies.similar_words import SimilarWordsStrategy
 from strategies.base import BaseStrategy
 from strategies.random import RandomStrategy
 from strategies.human import HumanStrategy
-from util.probabilities import alphabet
 ##############################################
 # (1) Import your strategy here              #
 ##############################################
@@ -24,11 +23,14 @@ flags.DEFINE_integer(
 ##############################################
 # (2) Add a flag value for your strat        #
 ##############################################
-flags.DEFINE_enum('strategy', 'similar_words', ['human', 'random', 'similar_words'], 'What type of strategy you want the AI to use.')
+flags.DEFINE_enum('strategy', 'similar_words', [
+                  'human', 'random', 'similar_words'], 'What type of strategy you want the AI to use.')
 
-flags.DEFINE_string('secret_word', None, 'Set this flag to the word that you want to be the secret one.')
+flags.DEFINE_string('secret_word', None,
+                    'Set this flag to the word that you want to be the secret one.')
 
 FLAGS = flags.FLAGS
+
 
 def pick_ai(game: Wordle, strategy: str) -> BaseStrategy:
     """Add your strategy in here."""
@@ -44,6 +46,7 @@ def pick_ai(game: Wordle, strategy: str) -> BaseStrategy:
     else:
         return BaseStrategy(game)
 
+
 def play_one_round(game: Wordle, strategy: str, secret_word: Optional[str] = None) -> GameResult:
     game.reset()
     if secret_word:
@@ -51,6 +54,7 @@ def play_one_round(game: Wordle, strategy: str, secret_word: Optional[str] = Non
     ai = pick_ai(game, strategy)
     result = ai.play_game()
     return GameResult(secret_word=game._secret_word, score=result, guessed_words=game.get_guessed_words())
+
 
 def ai_evaluator(game: Wordle, num_runs: int, strategy: str, secret_word: Optional[str]) -> None:
     run_score = []
@@ -67,7 +71,9 @@ def ai_evaluator(game: Wordle, num_runs: int, strategy: str, secret_word: Option
     print('Total rounds:', num_runs)
     print('Num failed rounds:', num_failures, '| Words:', failed_words)
     print('Average win score:', average(run_score) if run_score else -1)
-    print('histogram: ', histogram(run_score, bins=5, range=(1, game.num_tries_initial + 1))[0])
+    print('histogram: ', histogram(run_score, bins=5,
+                                   range=(1, game.num_tries_initial + 1))[0])
+
 
 def main(argv):
     if len(argv) > 1:
@@ -79,8 +85,6 @@ def main(argv):
         play_one_round(game, 'human', FLAGS.secret_word)
     else:
         ai_evaluator(game, FLAGS.num_evals, FLAGS.strategy, FLAGS.secret_word)
-
-
 
 
 if __name__ == '__main__':
