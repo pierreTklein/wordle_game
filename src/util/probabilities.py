@@ -4,12 +4,16 @@ from functools import reduce
 from typing import Dict, List, Tuple
 
 
+def alphabet() -> List[str]:
+    return ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+            'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+
+
 class Probabilities:
     def __init__(self, words: List[str], word_len: int = 5) -> None:
         self.words = words
         self.word_len = word_len
-        self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-                        'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+        self.letters = alphabet()
         self.letter_freqs: Dict[int, Dict[str, int]] = {}
         for i in range(0, word_len):
             self.letter_freqs[i] = {}
@@ -45,7 +49,7 @@ class Probabilities:
 
     def highest_shared_letters(self) -> List[Tuple[str, int]]:
         """Returns an ordered list of words and it's shared-letter count.
-        
+
         The shared-letter count is essentiallywith how many letters it shares
         with other words in the bag-of-words.
          """
