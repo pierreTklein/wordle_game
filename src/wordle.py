@@ -1,6 +1,7 @@
+from collections import Counter
 from enum import Enum
 import random
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 
 class Result(Enum):
@@ -17,9 +18,14 @@ class Wordle:
         self.word_len = word_len
         self.words = words
         self._secret_word = random.choice(seq=words)
+        self._secret_word_counts = Counter(self._secret_word)
         self.guesses = prev_guesses if prev_guesses else []
         self.num_tries_initial = num_tries_initial
         self.num_tries_remaining = num_tries_initial
+
+    def _set_secret_word(self, secret_word: str) -> None:
+        self._secret_word = secret_word
+        self._secret_word_counts = Counter(secret_word)
 
     @classmethod
     def from_file(cls, path: str, num_tries_initial: int = 5) -> "Wordle":
@@ -41,13 +47,18 @@ class Wordle:
 
         self.num_tries_remaining -= 1
         results = []
+        mapping = self._secret_word_counts.copy()
         for i, c in enumerate(guess_word):
             if self._secret_word[i] == c:
                 results.append(Result.CORRECT)
-            elif c in self._secret_word:
-                results.append(Result.IN_WORD)
+                mapping[c] -= 1
             else:
                 results.append(Result.INVALID)
+        for i, c in enumerate(guess_word):
+            # Make it known if there is an available match elsewhere
+            if results[i] == Result.INVALID and mapping[c]:
+                mapping[c] -= 1
+                results[i] = Result.IN_WORD
         guess_result = (guess_word, tuple(results))
         self.guesses.append(guess_result)
         return guess_result
@@ -65,9 +76,9 @@ class Wordle:
         return len(self.guesses) if self.has_won() else -1
 
     def rig_game(self, secret_word: str):
-        self._secret_word = secret_word
+        self._set_secret_word(secret_word)
 
     def reset(self):
-        self._secret_word = random.choice(self.words)
+        self._set_secret_word(random.choice(self.words))
         self.guesses = []
         self.num_tries_remaining = self.num_tries_initial
