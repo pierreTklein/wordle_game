@@ -86,7 +86,7 @@ class Wordle:
             if results[i] == Result.INVALID and mapping[c]:
                 mapping[c] -= 1
                 results[i] = Result.IN_WORD
-        guess_result = (guess_word, tuple(results))
+        guess_result = GuessResult(guess_word, tuple(results))
         self.guesses.append(guess_result)
         return guess_result
 
