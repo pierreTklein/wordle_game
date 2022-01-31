@@ -23,9 +23,16 @@ class LetterInfo:
         self._must_be_here = [False] * word_length
         self._must_be_not_here = [False] * word_length
         self._mask_arr = ['.'] * word_length
-        self._letter_mask = self._regen_mask()
+        self._letter_mask = self._regen_mask_str()
 
-    def _regen_mask(self) -> None:
+    def _regen_mask_str(self) -> str:
+        """Returns a string representing the mask for the secret word.
+
+        The mask contains all of the information we know about the existence
+        and location of this letter in the secret word, such as the number
+        of times it must appear in the word, where it must appear, and 
+        where it must not appear.
+        """
         negate_letter = f'[^{self.letter}]'
         for i in range(0, self._word_len):
             if self._must_be_here[i]:
@@ -43,7 +50,7 @@ class LetterInfo:
         mask_str = frequency_str + location_str
         logging.debug(
             f'{self.letter}: min: {self._min_count}, max: {self._max_count} | regex: {mask_str}')
-        self._letter_mask = re.compile(mask_str)
+        return mask_str
 
     def set_info(self, index: int, result: Result):
         if result == Result.CORRECT:
@@ -65,7 +72,7 @@ class LetterInfo:
         if self._hit_black:
             self._max_count = self._min_count
         self._cur_count = 0
-        self._regen_mask()
+        self._letter_mask = re.compile(self._regen_mask_str())
 
     def letter_mask(self) -> Pattern[str]:
         return self._letter_mask
