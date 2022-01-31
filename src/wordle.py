@@ -22,7 +22,7 @@ class GameResult(NamedTuple):
 
 
 class Wordle:
-    def __init__(self, words: List[str], word_len: int = 5, num_tries_initial: int = 6, prev_guesses: Optional[List[GuessResult]] = None) -> None:
+    def __init__(self, words: List[str], num_tries_initial: int, word_len: int = 5, prev_guesses: Optional[List[GuessResult]] = None) -> None:
         self.word_len = word_len
         self.words = words
         self._secret_word = random.choice(seq=words)
@@ -36,7 +36,7 @@ class Wordle:
         self._secret_word_counts = Counter(secret_word)
 
     @classmethod
-    def from_file(cls, path: str, num_tries_initial: int = 5) -> "Wordle":
+    def from_file(cls, path: str, num_tries_initial: int = 6) -> "Wordle":
         with open(path, "r") as file:
             return cls(list(map(lambda x: x.strip(), file.readlines())), num_tries_initial=num_tries_initial)
 

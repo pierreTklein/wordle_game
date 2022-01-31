@@ -10,7 +10,7 @@ def alphabet() -> List[str]:
 
 
 class Probabilities:
-    def __init__(self, words: List[str], word_len: int = 5) -> None:
+    def __init__(self, words: List[str], word_len: int) -> None:
         self.words = words
         self.word_len = word_len
         self.letters = alphabet()

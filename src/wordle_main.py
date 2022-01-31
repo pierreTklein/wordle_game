@@ -72,7 +72,7 @@ def ai_evaluator(game: Wordle, num_runs: int, strategy: str, secret_word: Option
     print('Total rounds:', num_runs)
     print('Num failed rounds:', num_failures, '| Words:', failed_words)
     print('Average win score:', average(run_score) if run_score else -1)
-    print('histogram: ', histogram(run_score, bins=5,
+    print('histogram: ', histogram(run_score, bins=game.num_tries_initial,
                                    range=(1, game.num_tries_initial + 1))[0])
 
 
