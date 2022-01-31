@@ -22,7 +22,7 @@ class GameResult(NamedTuple):
 
 
 class Wordle:
-    def __init__(self, words: List[str], num_tries_initial: int, word_len: int = 5, prev_guesses: Optional[List[GuessResult]] = None) -> None:
+    def __init__(self, words: List[str], num_tries_initial: int, word_len: int, prev_guesses: Optional[List[GuessResult]] = None) -> None:
         self.word_len = word_len
         self.words = words
         self._secret_word = random.choice(seq=words)
@@ -38,7 +38,18 @@ class Wordle:
     @classmethod
     def from_file(cls, path: str, num_tries_initial: int = 6) -> "Wordle":
         with open(path, "r") as file:
-            return cls(list(map(lambda x: x.strip(), file.readlines())), num_tries_initial=num_tries_initial)
+            words = list(map(lambda x: x.strip(), file.readlines()))
+            if not len(words):
+                # The word list must be non-empty
+                raise Exception(f'{path} has zero words.')
+            
+            word_len = len(words[0])
+            for w in words:
+                # All words must be the same length
+                if len(w) != word_len:
+                    raise Exception(f'Not all words in {path} are of the same length.')
+
+            return cls(words, num_tries_initial=num_tries_initial, word_len=word_len)
 
     def can_guess(self) -> bool:
         return self.num_tries_remaining > 0
