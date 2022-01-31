@@ -32,6 +32,13 @@ class Wordle:
         self.num_tries_remaining = num_tries_initial
 
     def _set_secret_word(self, secret_word: str) -> None:
+        if len(secret_word) != self.word_len:
+            raise Exception(
+                f'{secret_word} is not the proper word length ({len(secret_word)} instead of {self.word_len}).')
+
+        if secret_word not in self.words:
+            raise Exception(f'{secret_word} is not in set of available words.')
+
         self._secret_word = secret_word
         self._secret_word_counts = Counter(secret_word)
 
@@ -42,12 +49,13 @@ class Wordle:
             if not len(words):
                 # The word list must be non-empty
                 raise Exception(f'{path} has zero words.')
-            
+
             word_len = len(words[0])
             for w in words:
                 # All words must be the same length
                 if len(w) != word_len:
-                    raise Exception(f'Not all words in {path} are of the same length.')
+                    raise Exception(
+                        f'Not all words in {path} are of the same length.')
 
             return cls(words, num_tries_initial=num_tries_initial, word_len=word_len)
 
