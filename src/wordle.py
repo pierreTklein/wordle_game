@@ -1,5 +1,6 @@
 from collections import Counter
 from enum import Enum
+from optparse import Option
 import random
 from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple
 
@@ -105,7 +106,10 @@ class Wordle:
     def rig_game(self, secret_word: str):
         self._set_secret_word(secret_word)
 
-    def reset(self):
-        self._set_secret_word(random.choice(self.words))
+    def reset(self, secret_word: Optional[str] = None):
+        if secret_word:
+            self._set_secret_word(secret_word)
+        else:
+            self._set_secret_word(random.choice(self.words))
         self.guesses = []
         self.num_tries_remaining = self.num_tries_initial
