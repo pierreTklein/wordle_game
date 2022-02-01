@@ -26,6 +26,7 @@ class Wordle:
     def __init__(self, words: List[str], num_tries_initial: int, word_len: int, prev_guesses: Optional[List[GuessResult]] = None) -> None:
         self.word_len = word_len
         self.words = words
+        self.word_set = set(words)
         self._secret_word = random.choice(seq=words)
         self._secret_word_counts = Counter(self._secret_word)
         self.guesses = prev_guesses if prev_guesses else []
@@ -37,7 +38,7 @@ class Wordle:
             raise Exception(
                 f'{secret_word} is not the proper word length ({len(secret_word)} instead of {self.word_len}).')
 
-        if secret_word not in self.words:
+        if secret_word not in self.word_set:
             raise Exception(f'{secret_word} is not in set of available words.')
 
         self._secret_word = secret_word
@@ -64,7 +65,7 @@ class Wordle:
         return self.num_tries_remaining > 0
 
     def is_valid_guess(self, guess_word: str) -> bool:
-        return guess_word in self.words
+        return guess_word in self.word_set
 
     def guess(self, guess_word: str) -> GuessResult:
         if self.num_tries_remaining <= 0:
