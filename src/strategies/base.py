@@ -1,5 +1,5 @@
+from absl import logging
 from wordle import Wordle, GuessResult
-
 
 class BaseStrategy:
     def __init__(self, game: Wordle) -> None:
@@ -28,5 +28,7 @@ class BaseStrategy:
 
         Returns the game score."""
         while self.can_guess() and not self.has_won():
+            guess_result = self.make_guess(self.get_guess())
+            logging.debug(f'{self.game._secret_word} | {guess_result}')
             self.make_guess(self.get_guess())
         return self.game.get_score()

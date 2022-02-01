@@ -79,20 +79,19 @@ class LetterInfo:
 
 
 class GuessManager:
-    def __init__(self, game: Wordle, letter_info: Dict[str, LetterInfo] = None) -> None:
-        self.game = game
-        self.remaining_words = game.words
+    def __init__(self, word_pool: List[str], word_len: int, letter_info: Dict[str, LetterInfo] = None) -> None:
+        self.remaining_words = word_pool
+        self.word_len = word_len
         # Tracks how many remaining words are left based on the number of guesses.
         self.remaining_words_tracker = [len(self.remaining_words)]
         self.letter_info = letter_info if letter_info else {}
 
     def _update_letter_infos(self, guess_result: GuessResult) -> None:
         guess, result = guess_result
-        logging.debug(f'{self.game._secret_word} | {guess}: {result}')
         for i, r in enumerate(result):
             c = guess[i]
             if c not in self.letter_info.keys():
-                self.letter_info[c] = LetterInfo(c, self.game.word_len)
+                self.letter_info[c] = LetterInfo(c, self.word_len)
             self.letter_info[c].set_info(i, r)
         unique_letters = set(guess)
         for c in unique_letters:
@@ -124,7 +123,7 @@ class GuessManager:
 class SimilarWordsStrategy(BaseStrategy):
     def __init__(self, game: Wordle) -> None:
         super().__init__(game)
-        self.guess_manager = GuessManager(game)
+        self.guess_manager = GuessManager(game.words, game.word_len)
         self.probabilities = Probabilities(game.words, game.word_len)
 
     def get_guess(self) -> str:
