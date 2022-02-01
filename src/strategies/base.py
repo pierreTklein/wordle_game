@@ -30,5 +30,4 @@ class BaseStrategy:
         while self.can_guess() and not self.has_won():
             guess_result = self.make_guess(self.get_guess())
             logging.debug(f'{self.game._secret_word} | {guess_result}')
-            self.make_guess(self.get_guess())
         return self.game.get_score()
