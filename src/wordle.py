@@ -1,8 +1,7 @@
 from collections import Counter
 from enum import Enum
-from optparse import Option
 import random
-from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple
+from typing import List, NamedTuple, Optional, Sequence, Tuple
 
 
 class Result(Enum):
@@ -17,9 +16,14 @@ class GuessResult(NamedTuple):
 
 
 class GameResult(NamedTuple):
+    # The secret word for this game.
     secret_word: str
+    # The score of the game
     score: int
+    # Words that were guessed in the game
     guessed_words: Sequence[str]
+    # Runtime, in seconds
+    runtime: float
 
 
 class Wordle:
