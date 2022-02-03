@@ -1,3 +1,4 @@
+from absl import logging
 from collections import Counter
 from enum import Enum
 import random
@@ -27,7 +28,8 @@ class GameResult(NamedTuple):
 
 
 class Wordle:
-    def __init__(self, words: List[str], num_tries_initial: int, word_len: int, prev_guesses: Optional[List[GuessResult]] = None) -> None:
+    def __init__(self, words: List[str], num_tries_initial: int, word_len: int, hard_mode = False, prev_guesses: Optional[List[GuessResult]] = None) -> None:
+        self.hard_mode = hard_mode
         self.word_len = word_len
         self.words = words
         self.word_set = set(words)
@@ -49,7 +51,7 @@ class Wordle:
         self._secret_word_counts = Counter(secret_word)
 
     @classmethod
-    def from_file(cls, path: str, num_tries_initial: int = 6) -> "Wordle":
+    def from_file(cls, path: str, num_tries_initial: int = 6, hard_mode = False) -> "Wordle":
         with open(path, "r") as file:
             words = list(map(lambda x: x.strip(), file.readlines()))
             if not len(words):
@@ -63,12 +65,24 @@ class Wordle:
                     raise Exception(
                         f'Not all words in {path} are of the same length.')
 
-            return cls(words, num_tries_initial=num_tries_initial, word_len=word_len)
+            return cls(words, num_tries_initial=num_tries_initial, word_len=word_len, hard_mode=hard_mode)
 
     def can_guess(self) -> bool:
         return self.num_tries_remaining > 0
 
     def is_valid_guess(self, guess_word: str) -> bool:
+        if self.hard_mode:
+            # Hard mode is where you need to use all letters that are IN_WORD or CORRECT.
+            required_letters = set()
+            for guess_result in self.guesses:
+                for i, result in enumerate(guess_result.result):
+                    if result == Result.CORRECT or result == Result.IN_WORD:
+                        required_letters.add(guess_result.guess[i])
+            for req_letter in required_letters:
+                if req_letter not in guess_word:
+                    logging.error(f'{req_letter} must be in the guess word.')
+                    return False
+
         return guess_word in self.word_set
 
     def guess(self, guess_word: str) -> GuessResult:
@@ -76,7 +90,7 @@ class Wordle:
             raise Exception('No more guesses available.')
 
         if not self.is_valid_guess(guess_word):
-            raise Exception(f'{guess_word} is not a valid word.')
+            raise Exception(f'{guess_word} is not a valid guess.')
 
         self.num_tries_remaining -= 1
         results = []

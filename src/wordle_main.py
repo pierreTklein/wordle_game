@@ -30,6 +30,8 @@ flags.DEFINE_enum('strategy', 'similar_words', [
 flags.DEFINE_string('secret_word', None,
                     'Set this flag to the word that you want to be the secret one.')
 
+flags.DEFINE_bool('hard_mode', False, 'If true, play the hard-mode version of wordle.')
+
 FLAGS = flags.FLAGS
 
 
@@ -81,7 +83,7 @@ def ai_evaluator(game: Wordle, num_runs: int, strategy: str, secret_word: Option
 def main(argv):
     if len(argv) > 1:
         raise Exception('Too many arguments')
-    game = Wordle.from_file(FLAGS.words_file)
+    game = Wordle.from_file(FLAGS.words_file, hard_mode=FLAGS.hard_mode)
     if FLAGS.secret_word:
         game.rig_game(FLAGS.secret_word)
     if FLAGS.strategy == 'human':
