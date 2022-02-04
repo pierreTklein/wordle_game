@@ -27,8 +27,13 @@ class GameResult(NamedTuple):
     runtime: float
 
 
+class GuessValidation(NamedTuple):
+    is_valid: bool
+    error: Optional[str]
+
+
 class Wordle:
-    def __init__(self, words: List[str], num_tries_initial: int, word_len: int, hard_mode = False, prev_guesses: Optional[List[GuessResult]] = None) -> None:
+    def __init__(self, words: List[str], num_tries_initial: int, word_len: int, hard_mode=False, prev_guesses: Optional[List[GuessResult]] = None) -> None:
         self.hard_mode = hard_mode
         self.word_len = word_len
         self.words = words
@@ -51,7 +56,7 @@ class Wordle:
         self._secret_word_counts = Counter(secret_word)
 
     @classmethod
-    def from_file(cls, path: str, num_tries_initial: int = 6, hard_mode = False) -> "Wordle":
+    def from_file(cls, path: str, num_tries_initial: int = 6, hard_mode=False) -> "Wordle":
         with open(path, "r") as file:
             words = list(map(lambda x: x.strip(), file.readlines()))
             if not len(words):
@@ -70,27 +75,43 @@ class Wordle:
     def can_guess(self) -> bool:
         return self.num_tries_remaining > 0
 
-    def is_valid_guess(self, guess_word: str) -> bool:
+    def is_valid_guess(self, guess_word: str) -> GuessValidation:
+        if len(guess_word) != self.word_len:
+            return GuessValidation(False, f'{guess_word} is invalidd length.')
+
         if self.hard_mode:
             # Hard mode is where you need to use all letters that are IN_WORD or CORRECT.
             required_letters = set()
+            required_positions = [None] * self.word_len
             for guess_result in self.guesses:
                 for i, result in enumerate(guess_result.result):
                     if result == Result.CORRECT or result == Result.IN_WORD:
                         required_letters.add(guess_result.guess[i])
-            for req_letter in required_letters:
-                if req_letter not in guess_word:
-                    logging.error(f'{req_letter} must be in the guess word.')
-                    return False
+                    if result == Result.CORRECT:
+                        required_positions[i] = guess_result.guess[i]
+            # Guess word must have all required letters
+            guess_word_set = set([*guess_word])
+            missing_letters = required_letters.difference(guess_word_set)
 
-        return guess_word in self.word_set
+            if missing_letters:
+                return GuessValidation(False, f'[{", ".join(missing_letters)}] must be in the guess word.')
+
+            for i, letter in enumerate(guess_word):
+                if required_positions[i] and required_positions[i] != letter:
+                    return GuessValidation(False, f'The letter {required_positions[i]} must be at position {i+1}.')
+
+        if guess_word not in self.word_set:
+            return GuessValidation(False, f'{guess_word} is not a valid guess.')
+
+        return GuessValidation(True, None)
 
     def guess(self, guess_word: str) -> GuessResult:
         if self.num_tries_remaining <= 0:
             raise Exception('No more guesses available.')
 
-        if not self.is_valid_guess(guess_word):
-            raise Exception(f'{guess_word} is not a valid guess.')
+        validation_check = self.is_valid_guess(guess_word)
+        if not validation_check.is_valid:
+            raise Exception(validation_check.error)
 
         self.num_tries_remaining -= 1
         results = []
