@@ -1,7 +1,8 @@
+import random
 from typing import Optional
 from absl import app
 from absl import flags
-
+import time
 
 from numpy import average, histogram
 from wordle import GameResult, Wordle
@@ -13,6 +14,8 @@ from strategies.base import BaseStrategy
 from strategies.human import HumanStrategy
 from strategies.random import RandomStrategy
 from strategies.similar_words import SimilarWordsStrategy
+from strategies.omniscience import OmniscienceStrategy
+from strategies.maximal_information import MaximalInformationStrategy
 
 
 flags.DEFINE_string('words_file', './bag_of_words.txt',
@@ -25,7 +28,8 @@ flags.DEFINE_integer(
 # (2) Add a flag value for your strat        #
 ##############################################
 flags.DEFINE_enum('strategy', 'similar_words', [
-                  'human', 'random', 'similar_words'], 'What type of strategy you want the AI to use.')
+                  'human', 'random', 'similar_words',
+                  'omniscience', 'maximal_information'], 'What type of strategy you want the AI to use.')
 
 flags.DEFINE_string('secret_word', None,
                     'Set this flag to the word that you want to be the secret one.')
@@ -41,6 +45,10 @@ def pick_ai(game: Wordle, strategy: str) -> BaseStrategy:
         return SimilarWordsStrategy(game)
     elif strategy == 'human':
         return HumanStrategy(game)
+    elif strategy == 'omniscience':
+        return OmniscienceStrategy(game)
+    elif strategy == 'maximal_information':
+        return MaximalInformationStrategy(game)
     ##############################################
     # (3) Construct your strategy here           #
     ##############################################
@@ -62,6 +70,7 @@ def ai_evaluator(game: Wordle, num_runs: int, strategy: str, secret_word: Option
     num_failures = 0
     failed_words = []
     for i in range(0, num_runs):
+        print("Playing 1 round")
         game_result = play_one_round(game, strategy, secret_word)
         print(game_result)
         if game_result.score > 0:
@@ -80,6 +89,9 @@ def main(argv):
     if len(argv) > 1:
         raise Exception('Too many arguments')
     game = Wordle.from_file(FLAGS.words_file)
+    game.words = random.sample(game.words, 400)
+    game.word_set = set(game.words)
+    game.rig_game(random.choice(game.words))
     if FLAGS.secret_word:
         game.rig_game(FLAGS.secret_word)
     if FLAGS.strategy == 'human':
