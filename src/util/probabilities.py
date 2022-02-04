@@ -14,6 +14,7 @@ class Probabilities:
         self.words = words
         self.word_len = word_len
         self.letters = alphabet()
+        # {index in word => {letter => num times seen at index}}
         self.letter_freqs: Dict[int, Dict[str, int]] = {}
         for i in range(0, word_len):
             self.letter_freqs[i] = {}

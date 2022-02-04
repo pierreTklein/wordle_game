@@ -34,6 +34,9 @@ flags.DEFINE_enum('strategy', 'similar_words', [
 flags.DEFINE_string('secret_word', None,
                     'Set this flag to the word that you want to be the secret one.')
 
+flags.DEFINE_bool('hard_mode', False,
+                  'If true, play the hard-mode version of wordle.')
+
 FLAGS = flags.FLAGS
 
 
@@ -61,18 +64,19 @@ def play_one_round(game: Wordle, strategy: str, secret_word: Optional[str] = Non
     if secret_word:
         game.rig_game(secret_word)
     ai = pick_ai(game, strategy)
-    result = ai.play_game()
-    return GameResult(secret_word=game._secret_word, score=result, guessed_words=game.get_guessed_words())
+    return ai.play_game()
 
 
 def ai_evaluator(game: Wordle, num_runs: int, strategy: str, secret_word: Optional[str]) -> None:
     run_score = []
     num_failures = 0
     failed_words = []
+    runtimes = []
     for i in range(0, num_runs):
         print("Playing 1 round")
         game_result = play_one_round(game, strategy, secret_word)
         print(game_result)
+        runtimes.append(game_result.runtime)
         if game_result.score > 0:
             run_score.append(game_result.score)
         else:
@@ -81,6 +85,8 @@ def ai_evaluator(game: Wordle, num_runs: int, strategy: str, secret_word: Option
     print('Total rounds:', num_runs)
     print('Num failed rounds:', num_failures, '| Words:', failed_words)
     print('Average win score:', average(run_score) if run_score else -1)
+    print(
+        f'Average runtime: {round(average(runtimes), 3) if runtimes else -1}s')
     print('histogram: ', histogram(run_score, bins=game.num_tries_initial,
                                    range=(1, game.num_tries_initial + 1))[0])
 
@@ -88,7 +94,7 @@ def ai_evaluator(game: Wordle, num_runs: int, strategy: str, secret_word: Option
 def main(argv):
     if len(argv) > 1:
         raise Exception('Too many arguments')
-    game = Wordle.from_file(FLAGS.words_file)
+    game = Wordle.from_file(FLAGS.words_file, hard_mode=FLAGS.hard_mode)
     game.words = random.sample(game.words, 400)
     game.word_set = set(game.words)
     game.rig_game(random.choice(game.words))
