@@ -95,7 +95,7 @@ def main(argv):
     if len(argv) > 1:
         raise Exception('Too many arguments')
     game = Wordle.from_file(FLAGS.words_file, hard_mode=FLAGS.hard_mode)
-    game.words = random.sample(game.words, 400)
+    game.words = random.sample(game.words, 100)
     game.word_set = set(game.words)
     game.rig_game(random.choice(game.words))
     if FLAGS.secret_word:
