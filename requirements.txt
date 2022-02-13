@@ -1,0 +1,4 @@
+absl==0.0
+absl_py==0.6.1
+numpy==1.15.4
+typing_extensions==3.7.4.1

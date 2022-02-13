@@ -14,9 +14,12 @@ class HumanStrategy(BaseStrategy):
         while True:
             guess = input(
                 f'[{len(self.game.guesses)+1}/{self.game.num_tries_initial}] Enter guess:')
-            if self.game.is_valid_guess(guess):
+            validation_result = self.game.is_valid_guess(guess)
+            if validation_result.is_valid:
                 break
-            print('Invalid word, please try again.')
+            else:
+                print(validation_result.error)
+                print('Please try again.')
         return guess
 
     def make_guess(self, guess: str) -> GuessResult:
